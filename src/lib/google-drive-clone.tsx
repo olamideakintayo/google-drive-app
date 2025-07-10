@@ -14,17 +14,17 @@ import {
   Archive,
   CloudUpload,
 } from "lucide-react"
-import { Button } from "~/components/ui/button"
-import { Input } from "~/components/ui/input"
-import { Card, CardContent } from "~/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
+import { Button } from "../components/ui/button"
+import { Input } from "../components/ui/input"
+import { Card, CardContent } from "../components/ui/card"
+import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "~/components/ui/dropdown-menu"
+} from "../components/ui/dropdown-menu"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -32,26 +32,38 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "~/components/ui/breadcrumb"
-import { Badge } from "~/components/ui/badge"
+} from "../components/ui/breadcrumb"
+import { Badge } from "../components/ui/badge"
 
 // Mock data structure
-const mockData = {
+interface FileItem {
+  id: string
+  name: string
+  type: "file" | "folder"
+  fileType?: string
+  size?: string
+  modified: string
+  url?: string
+  items?: FileItem[]
+}
+
+const mockData: { root: FileItem } = {
   root: {
     id: "root",
     name: "My Drive",
-    type: "folder",
+    type: "folder" as const,
+    modified: "2024-01-01",
     items: [
       {
         id: "1",
         name: "Documents",
-        type: "folder",
+        type: "folder" as const,
         modified: "2024-01-15",
         items: [
           {
             id: "1-1",
             name: "Resume.pdf",
-            type: "file",
+            type: "file" as const,
             fileType: "pdf",
             size: "2.3 MB",
             modified: "2024-01-10",
@@ -60,7 +72,7 @@ const mockData = {
           {
             id: "1-2",
             name: "Cover Letter.docx",
-            type: "file",
+            type: "file" as const,
             fileType: "document",
             size: "1.1 MB",
             modified: "2024-01-12",
@@ -69,7 +81,7 @@ const mockData = {
           {
             id: "1-3",
             name: "Project Proposal.pdf",
-            type: "file",
+            type: "file" as const,
             fileType: "pdf",
             size: "5.2 MB",
             modified: "2024-01-15",
@@ -80,19 +92,19 @@ const mockData = {
       {
         id: "2",
         name: "Photos",
-        type: "folder",
+        type: "folder" as const,
         modified: "2024-01-20",
         items: [
           {
             id: "2-1",
             name: "Vacation 2024",
-            type: "folder",
+            type: "folder" as const,
             modified: "2024-01-20",
             items: [
               {
                 id: "2-1-1",
                 name: "beach.jpg",
-                type: "file",
+                type: "file" as const,
                 fileType: "image",
                 size: "3.2 MB",
                 modified: "2024-01-18",
@@ -101,7 +113,7 @@ const mockData = {
               {
                 id: "2-1-2",
                 name: "sunset.jpg",
-                type: "file",
+                type: "file" as const,
                 fileType: "image",
                 size: "2.8 MB",
                 modified: "2024-01-19",
@@ -112,7 +124,7 @@ const mockData = {
           {
             id: "2-2",
             name: "profile.png",
-            type: "file",
+            type: "file" as const,
             fileType: "image",
             size: "1.5 MB",
             modified: "2024-01-20",
@@ -123,13 +135,13 @@ const mockData = {
       {
         id: "3",
         name: "Videos",
-        type: "folder",
+        type: "folder" as const,
         modified: "2024-01-18",
         items: [
           {
             id: "3-1",
             name: "presentation.mp4",
-            type: "file",
+            type: "file" as const,
             fileType: "video",
             size: "45.2 MB",
             modified: "2024-01-18",
@@ -138,7 +150,7 @@ const mockData = {
           {
             id: "3-2",
             name: "demo.mov",
-            type: "file",
+            type: "file" as const,
             fileType: "video",
             size: "23.1 MB",
             modified: "2024-01-17",
@@ -149,7 +161,7 @@ const mockData = {
       {
         id: "4",
         name: "Spreadsheet.xlsx",
-        type: "file",
+        type: "file" as const,
         fileType: "document",
         size: "892 KB",
         modified: "2024-01-22",
@@ -158,7 +170,7 @@ const mockData = {
       {
         id: "5",
         name: "Archive.zip",
-        type: "file",
+        type: "file" as const,
         fileType: "archive",
         size: "12.3 MB",
         modified: "2024-01-21",
@@ -167,7 +179,7 @@ const mockData = {
       {
         id: "6",
         name: "Music.mp3",
-        type: "file",
+        type: "file" as const,
         fileType: "audio",
         size: "4.2 MB",
         modified: "2024-01-19",
@@ -175,17 +187,6 @@ const mockData = {
       },
     ],
   },
-}
-
-interface FileItem {
-  id: string
-  name: string
-  type: "file" | "folder"
-  fileType?: string
-  size?: string
-  modified: string
-  url?: string
-  items?: FileItem[]
 }
 
 const getFileIcon = (fileType: string) => {
@@ -218,7 +219,7 @@ const findItemById = (items: FileItem[], id: string): FileItem | null => {
   return null
 }
 
-const buildBreadcrumbs = (currentPath: string[], data: typeof mockData) => {
+const buildBreadcrumbs = (currentPath: string[], data: { root: FileItem }) => {
   const breadcrumbs = [{ id: "root", name: "My Drive" }]
   let current = data.root
 
