@@ -247,7 +247,11 @@ export default function GoogleDriveClone() {
 
     let current = mockData.root
     for (let i = 1; i < currentPath.length; i++) {
-      const foundItem = findItemById(current.items || [], currentPath[i])
+      const pathId = currentPath[i]
+      if (typeof pathId !== "string") {
+        return mockData.root
+      }
+      const foundItem = findItemById(current.items ?? [], pathId)
       if (foundItem) {
         current = foundItem
       } else {
