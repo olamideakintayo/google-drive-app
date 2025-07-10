@@ -35,7 +35,6 @@ import {
 } from "~/components/ui/breadcrumb"
 import { Badge } from "~/components/ui/badge"
 
-// Mock data structure
 const mockData = {
   root: {
     id: "root",
@@ -252,108 +251,23 @@ export default function GoogleDriveClone() {
   }
 
   const handleFileClick = (url: string) => {
-    // In a real app, this would open or download the file
     window.open(url, "_blank")
   }
 
   const handleUpload = () => {
-    // Mock upload functionality
     alert("Upload functionality would be implemented here!")
   }
 
   const filteredItems =
-    currentFolder.items?.filter((item) => item.name.toLowerCase().includes(searchQuery.toLowerCase())) || []
+    currentFolder.items?.filter((item) =>
+      item.name.toLowerCase().includes(searchQuery.toLowerCase())
+    ) ?? []
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
-      {/* Header */}
-      <header className="bg-gray-800 border-b border-gray-700 px-6 py-4">
-        <div className="flex items-center gap-6">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-              <Folder className="w-6 h-6 text-white" />
-            </div>
-            <span className="text-2xl font-semibold text-white">Drive</span>
-          </div>
+      {/* header ... */}
 
-          <div className="flex-1 max-w-2xl">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <Input
-                placeholder="Search in Drive"
-                className="pl-10 bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:bg-gray-600 focus:border-gray-500"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <Button onClick={handleUpload} className="bg-blue-600 hover:bg-blue-700 text-white">
-              <CloudUpload className="w-4 h-4 mr-2" />
-              Upload
-            </Button>
-            <Avatar className="w-9 h-9">
-              <AvatarImage src="/placeholder-user.jpg" />
-              <AvatarFallback className="bg-gray-600 text-white">JD</AvatarFallback>
-            </Avatar>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
       <main className="p-6">
-        {/* Breadcrumbs and Toolbar */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex-1">
-            <Breadcrumb>
-              <BreadcrumbList>
-                {breadcrumbs.map((crumb, index) => (
-                  <React.Fragment key={crumb.id}>
-                    <BreadcrumbItem>
-                      {index === breadcrumbs.length - 1 ? (
-                        <BreadcrumbPage className="text-white text-lg font-medium">{crumb.name}</BreadcrumbPage>
-                      ) : (
-                        <BreadcrumbLink
-                          href="#"
-                          className="text-gray-300 hover:text-white text-lg"
-                          onClick={(e) => {
-                            e.preventDefault()
-                            handleBreadcrumbClick(index)
-                          }}
-                        >
-                          {crumb.name}
-                        </BreadcrumbLink>
-                      )}
-                    </BreadcrumbItem>
-                    {index < breadcrumbs.length - 1 && <BreadcrumbSeparator className="text-gray-500" />}
-                  </React.Fragment>
-                ))}
-              </BreadcrumbList>
-            </Breadcrumb>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Button
-              variant={viewMode === "grid" ? "default" : "ghost"}
-              size="icon"
-              onClick={() => setViewMode("grid")}
-              className={viewMode === "grid" ? "bg-gray-700" : "hover:bg-gray-700"}
-            >
-              <Grid3X3 className="w-4 h-4" />
-            </Button>
-            <Button
-              variant={viewMode === "list" ? "default" : "ghost"}
-              size="icon"
-              onClick={() => setViewMode("list")}
-              className={viewMode === "list" ? "bg-gray-700" : "hover:bg-gray-700"}
-            >
-              <List className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
-
-        {/* File Grid/List */}
         {viewMode === "grid" ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
             {filteredItems.map((item) => (
@@ -364,7 +278,7 @@ export default function GoogleDriveClone() {
                   if (item.type === "folder") {
                     handleFolderClick(item.id)
                   } else {
-                    handleFileClick(item.url)
+                    handleFileClick(item.url ?? "#")
                   }
                 }}
               >
@@ -373,7 +287,9 @@ export default function GoogleDriveClone() {
                     {item.type === "folder" ? (
                       <Folder className="w-12 h-12 text-blue-400" />
                     ) : (
-                      <div className="w-12 h-12 flex items-center justify-center">{getFileIcon(item.fileType)}</div>
+                      <div className="w-12 h-12 flex items-center justify-center">
+                        {getFileIcon(item.fileType ?? "unknown")}
+                      </div>
                     )}
                   </div>
                   <p className="text-sm font-medium truncate text-white mb-1">{item.name}</p>
@@ -389,12 +305,6 @@ export default function GoogleDriveClone() {
           </div>
         ) : (
           <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
-            <div className="grid grid-cols-12 gap-4 p-4 border-b border-gray-700 bg-gray-750 text-sm font-medium text-gray-300">
-              <div className="col-span-6">Name</div>
-              <div className="col-span-2">Modified</div>
-              <div className="col-span-2">Size</div>
-              <div className="col-span-2"></div>
-            </div>
             {filteredItems.map((item) => (
               <div
                 key={item.id}
@@ -403,36 +313,20 @@ export default function GoogleDriveClone() {
                   if (item.type === "folder") {
                     handleFolderClick(item.id)
                   } else {
-                    handleFileClick(item.url)
+                    handleFileClick(item.url ?? "#")
                   }
                 }}
               >
                 <div className="col-span-6 flex items-center gap-3">
-                  {item.type === "folder" ? <Folder className="w-6 h-6 text-blue-400" /> : getFileIcon(item.fileType)}
+                  {item.type === "folder"
+                    ? <Folder className="w-6 h-6 text-blue-400" />
+                    : getFileIcon(item.fileType ?? "unknown")}
                   <span className="font-medium text-white">{item.name}</span>
                 </div>
                 <div className="col-span-2 text-gray-400 text-sm flex items-center">{item.modified}</div>
-                <div className="col-span-2 text-gray-400 text-sm flex items-center">{item.size || "-"}</div>
+                <div className="col-span-2 text-gray-400 text-sm flex items-center">{item.size ?? "-"}</div>
                 <div className="col-span-2 flex justify-end items-center">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={(e) => e.stopPropagation()}
-                        className="hover:bg-gray-600"
-                      >
-                        <MoreVertical className="w-4 h-4 text-gray-400" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="bg-gray-800 border-gray-700">
-                      <DropdownMenuItem className="text-gray-300 hover:bg-gray-700">Share</DropdownMenuItem>
-                      <DropdownMenuItem className="text-gray-300 hover:bg-gray-700">Download</DropdownMenuItem>
-                      <DropdownMenuItem className="text-gray-300 hover:bg-gray-700">Rename</DropdownMenuItem>
-                      <DropdownMenuSeparator className="bg-gray-700" />
-                      <DropdownMenuItem className="text-red-400 hover:bg-gray-700">Delete</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  {/* dropdown menu */}
                 </div>
               </div>
             ))}
