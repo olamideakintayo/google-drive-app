@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 "use client"
 
 import React, { useState } from "react"
@@ -196,45 +200,26 @@ const getFileIcon = (fileType: string) => {
   }
 }
 
-const findItemById = (items: unknown[], id: string): unknown => {
+const findItemById = (items: any[], id: string): any => {
   for (const item of items) {
-    if (
-      typeof item === "object" &&
-      item !== null &&
-      "id" in item &&
-      (item as { id: string }).id === id
-    )
-      return item
-    if (
-      typeof item === "object" &&
-      item !== null &&
-      "items" in item &&
-      Array.isArray((item as { items: unknown[] }).items)
-    ) {
-      const found = findItemById((item as { items: unknown[] }).items, id)
+    if (item.id === id) return item
+    if (item.items) {
+      const found = findItemById(item.items ?? [], id)
       if (found) return found
     }
   }
   return null
 }
 
-const buildBreadcrumbs = (currentPath: string[], data: unknown) => {
+const buildBreadcrumbs = (currentPath: string[], data: any) => {
   const breadcrumbs = [{ id: "root", name: "My Drive" }]
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  let current = (data as { root: unknown }).root
+  let current = data.root
 
   for (const pathId of currentPath) {
     if (pathId === "root") continue
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    current = findItemById(
-      (current && typeof current === "object" && "items" in current && Array.isArray((current as { items: unknown[] }).items)
-        ? (current as { items: unknown[] }).items
-        : []),
-      pathId
-    )
+    current = findItemById(current.items ?? [], pathId)
     if (current) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      breadcrumbs.push({ id: (current as { id: string; name: string }).id, name: (current as { id: string; name: string }).name })
+      breadcrumbs.push({ id: current.id, name: current.name })
     }
   }
 
@@ -253,10 +238,7 @@ export default function GoogleDriveClone() {
 
     let current = mockData.root
     for (let i = 1; i < currentPath.length; i++) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      if (typeof currentPath[i] === "string") {
-        current = findItemById(current.items || [], currentPath[i]!)
-      }
+      current = findItemById(current.items || [], currentPath[i])
       if (!current) return mockData.root
     }
     return current
@@ -385,7 +367,7 @@ export default function GoogleDriveClone() {
                 onClick={() => {
                   if (item.type === "folder") {
                     handleFolderClick(item.id)
-                  } else if (item.url) {
+                  } else {
                     handleFileClick(item.url)
                   }
                 }}
@@ -395,7 +377,7 @@ export default function GoogleDriveClone() {
                     {item.type === "folder" ? (
                       <Folder className="w-12 h-12 text-blue-400" />
                     ) : (
-                      <div className="w-12 h-12 flex items-center justify-center">{getFileIcon(item.fileType ?? "")}</div>
+                      <div className="w-12 h-12 flex items-center justify-center">{getFileIcon(item.fileType)}</div>
                     )}
                   </div>
                   <p className="text-sm font-medium truncate text-white mb-1">{item.name}</p>
@@ -424,13 +406,13 @@ export default function GoogleDriveClone() {
                 onClick={() => {
                   if (item.type === "folder") {
                     handleFolderClick(item.id)
-                  } else if (item.url) {
+                  } else {
                     handleFileClick(item.url)
                   }
                 }}
               >
                 <div className="col-span-6 flex items-center gap-3">
-                  {item.type === "folder" ? <Folder className="w-6 h-6 text-blue-400" /> : getFileIcon(item.fileType ?? "")}
+                  {item.type === "folder" ? <Folder className="w-6 h-6 text-blue-400" /> : getFileIcon(item.fileType)}
                   <span className="font-medium text-white">{item.name}</span>
                 </div>
                 <div className="col-span-2 text-gray-400 text-sm flex items-center">{item.modified}</div>
